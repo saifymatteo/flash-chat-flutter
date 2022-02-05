@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flash_chat/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
@@ -13,14 +14,21 @@ class _ChatScreenState extends State<ChatScreen> {
   // Initialize FirebaseAuth object
   final _auth = FirebaseAuth.instance;
 
+  // Initialize Firestore object
+  final _firestore = FirebaseFirestore.instance;
+
   // To store current logged-in user
   User loggedInUser;
+
+  // To store message text
+  String messageText;
 
   @override
   void initState() {
     super.initState();
     // Run our get current user method
     getCurrentUser();
+    messageStreams();
   }
 
   void getCurrentUser() {
@@ -33,6 +41,16 @@ class _ChatScreenState extends State<ChatScreen> {
       }
     } catch (exception) {
       print(exception);
+    }
+  }
+
+  // Messages stream from Firestore
+  void messageStreams() async {
+    // Get messages from Firestore
+    await for (var snapshot in _firestore.collection('messages').snapshots()) {
+      for (var message in snapshot.docs) {
+        print(message.data());
+      }
     }
   }
 
@@ -67,6 +85,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   Expanded(
                     child: TextField(
                       onChanged: (value) {
+                        messageText = value;
                         //Do something with the user input.
                       },
                       decoration: kMessageTextFieldDecoration,
@@ -75,6 +94,10 @@ class _ChatScreenState extends State<ChatScreen> {
                   // ignore: deprecated_member_use
                   FlatButton(
                     onPressed: () {
+                      _firestore.collection('messages').add({
+                        'text': messageText,
+                        'sender': loggedInUser.email,
+                      });
                       //Implement send functionality.
                     },
                     child: Text(

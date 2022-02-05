@@ -19,7 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   // For [modal_progress_hud] package, set to false so there is no spinning at first
   bool showSpinner = false;
 
-  // To store user input
+  // * To store user input
   String email;
   String password;
 
@@ -50,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 keyboardType: TextInputType.emailAddress,
                 onChanged: (value) {
                   email = value;
-                  //Do something with the user input.
+                  // ? Do something with the user input.
                 },
                 decoration: kTextFieldDecoration.copyWith(
                   hintText: 'Enter your email',
